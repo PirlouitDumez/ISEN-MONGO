@@ -16,6 +16,7 @@ def d(u,v):
     return ((u[0]-v[0])**2+(u[1]-v[1])**2)**0.5
 
 
+
 def order_stations_by_distance(db, position=[3.068022,50.631750], filter0=True):
     """ return stations ordered py distance to "position" """
     if filter0:
@@ -26,6 +27,7 @@ def order_stations_by_distance(db, position=[3.068022,50.631750], filter0=True):
     q = db.stations.find({"_id": {"$in" : ids}})
     l = sorted(q, key=lambda a:d(a['geometry']['coordinates'], position))
     return l
+
 
 
 def get_stations_history(db):
@@ -50,18 +52,20 @@ def get_stations_history(db):
     for d in datas_:
         dic[d['station_id']]['history'].append([d['date'],d["bike_availbale"],d["stand_availbale"]])
     
-    print(dic[66])
     return dic
 
 
 
-def show_stations(stations):
+def show_stations(history):
     print('# Stations :')
+    if len(history.keys() == 0):
+        print("No stations")
+        return 
+    
     print("- {: <27}".format("NAME"),
           "{: <8}".format(f"BIKES"),
           "{: <25}".format("LOCATION"),
           "   TPE")
-        
     for id in history:
         station = history[id]
         print("- {: <27}".format(station['name']),
