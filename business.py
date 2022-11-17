@@ -5,7 +5,8 @@ from pprint import pprint
 
 def search_station_by_name(db,name):
     """find all stations containing the characters entered by the user"""
-    found = db.stations.find({"name": {"$regex": name, "$options": "i" }})
+    found = db.stations.find({"name": {"$regex": name, "$options": "i" },"Available":True})
+    
     pprint(list(found))
     return
     
@@ -26,3 +27,11 @@ def delete_station(db,id):
     db.data.delete_many( {"idstation":id} )
     print("station information deleted")
     return
+
+def desactivate_station(db,id):
+    filter = { "_id" : id}
+    db.stations.update_one(filter, {"$set":{"Available":False}})
+    
+def activate_station(db,id):
+    filter = { "_id" : id}
+    db.stations.update_one(filter, {"$set":{"Available":True}})

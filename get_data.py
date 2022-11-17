@@ -40,6 +40,10 @@ try:
 except:
     pass
 
+for station in db.stations.find():
+        update_dict = {'Available':True}
+        db.station.update_one({"_id": station["_id"]}, {"$set": update_dict})
+
 
 def update(db):
     print('update')
@@ -56,4 +60,3 @@ def update(db):
     
     for data in datas:
         db.datas.update_one({'date': data["date"], "station_id": data["station_id"]}, { "$set": data }, upsert=True)
-
