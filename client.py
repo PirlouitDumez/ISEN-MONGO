@@ -1,7 +1,11 @@
-def find_all(db):
-    # filtre nearby dans global
+def find_all(db, affichage=True):
+    # filtre all stations
     found = db.stations.find({})
     found = list(found)
+    
+    if not affichage:
+        return found
+    
     if len(found)>0:
         # get datas row corresponding to id
         for f in found:
@@ -11,12 +15,14 @@ def find_all(db):
             print('\n')
     else:
         print("No station in area")
+        
+    return found
 
  
 
 
-def find_in_area(db,pos,dist=100):
-    # filtre nearby dans global
+def find_in_area(db,pos,dist=100,affichage=True):
+    # find stations in circle around position
     db.stations.create_index([('geometry','2dsphere')])
     found = db.stations.find({'geometry': {'$near': {
                                                 '$geometry': {
@@ -26,6 +32,10 @@ def find_in_area(db,pos,dist=100):
                                                 }}})
 
     found = list(found)
+    
+    if not affichage:
+        return found
+    
     if len(found)>0:
         # get datas row corresponding to id
         for f in found:
@@ -35,6 +45,37 @@ def find_in_area(db,pos,dist=100):
             print('\n')
     else:
         print("No station in area")
+        
+    return found
+
+
+
+
+def find_in_polygon(db, coordinates, affichage=True):
+    # find stations in polygon 
+    db.stations.create_index([('geometry','2dsphere')])
+    found = db.stations.find({'geometry': {'$geoWithin': {
+                                                '$geometry': {
+                                                    'type': "Polygon" ,
+                                                    'coordinates': coordinates}}}})
+
+    found = list(found)
+    
+    if not affichage:
+        return found
+    
+    if len(found)>0:
+        # get datas row corresponding to id
+        for f in found:
+            found_data = list(db.datas.find({"station_id" : f["_id"]}).sort([("date", -1)]).limit(1))[0]
+            print(f"Station {f['_id']}: {f['name']} : {found_data['bike_availbale']}/{f['size']} ({found_data['date']})")
+            print(f"position : {f['geometry']['coordinates']}")
+            print('\n')
+    else:
+        print("No station in area")
+        
+    return found
+
 
 
 
@@ -51,5 +92,13 @@ if __name__ == '__main__':
     update(db)
         
     position=[3.048567, 50.634268]
-    #find_all(db)
-    find_in_area(db, position, dist=300)
+    stations = find_all(db, affichage=False)
+    print(len(stations))
+    
+    stations = find_in_area(db, position, dist=300, affichage=False)
+    print(len(stations))
+    
+    alpha = 0.005
+    coords = [[[3.048567+alpha, 50.634268], [3.048567, 50.634268+alpha], [3.048567-alpha, 50.634268], [3.048567, 50.634268-alpha], [3.048567+alpha, 50.634268]]]
+    stations = find_in_polygon(db, coords, affichage=True)
+    print(len(stations))
