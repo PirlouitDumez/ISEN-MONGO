@@ -19,7 +19,7 @@ if __name__ == '__main__':
     running=True
     while running:
         print("Choose an action : \n 1 - Give station next to user \n 2 - Search station by name \n 3 - Update a station \n 4"
-              + " - Delete a station \n 5 - Desactivate all station in an area\n 6 -  Give all stations with a ratio bike/total_stand under 20%\n Other entry - Exit " +
+              + " - Delete a station \n 5 - Activate/Desactivate all station in an area\n 6 -  Give all stations with a ratio bike/total_stand under 20%\n Other entry - Exit " +
               " \n -------------------------------------------------------------------------------------------------------------")
         try:
             choice = int(input())
@@ -28,7 +28,26 @@ if __name__ == '__main__':
             running=False
             break
         if choice==1: #give station nearby
-            pass
+            print("Enter your geo position : \n  ")
+            try:
+                longitude = float(input("Longitude : "))
+            except:
+                print('Wrong entry')
+                break
+            try:
+                latitude = float(input("Latitude : ")) 
+            except:
+                print("Wrong entry")
+                break    
+            print("Enter the maximum distance between you and the station : ")
+            try:
+                distance = float(input()) 
+            except:
+                print("Wrong entry")
+                break    
+
+            find_in_area(db,[longitude,latitude],distance)
+            
         
         elif choice==2: #search by name
             print("Enter the name of the station (or some letters)")
@@ -80,7 +99,19 @@ if __name__ == '__main__':
                 print(f"Station {id} has been successfully deleted")
             else:
                 print("Suppression canceled")
-        elif choice==5: #desactivate in area
+        elif choice==5: #activate/desactivate in area
+            print("Enter a to activate a station, d to desactivate a station and any other character to go back to main menu")
+            alpha = 0.005
+            default_coords =  [[[3.048567+alpha, 50.634268], [3.048567, 50.634268+alpha], [3.048567-alpha, 50.634268], [3.048567, 50.634268-alpha], [3.048567+alpha, 50.634268]]]
+            choice_activation = input()
+            if choice_activation == "a":
+                print(f"Activating stations in this polygon : {[default_coords]} (modify the main source code to change coords because it's too long to enter it manually)")
+                activate_in_polygon(db,default_coords)
+            elif choice_activation == "d":
+                print(f"Desactivating stations in this polygon : {[default_coords]} (modify the main source code to change coords because it's too long to enter it manually)")
+                desactivate_in_polygon(db,default_coords)
+            else:
+                pass
             pass
         elif choice==6: #give all stations with ratio bike/total_stand under 20%
             pass
@@ -90,17 +121,4 @@ if __name__ == '__main__':
            
             
             
-    """    
-    #for station in db.stations.find():
-    #    pprint.pprint(list(station))
-    desactivate_station(db,240)
-    search_station_by_name(db,"Poste")
-    #delete_station(db,240)
-    #search_station_by_name(db,"Poste")
-    update_station(db,53,{"name":"Poste","size":12})
-    search_station_by_name(db,"Poste")
     
-    #position=[3.068022,50.631750][::-1]
-    #location_program(db, position, dist=1000)
-    
-    """
