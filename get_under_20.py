@@ -1,6 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
-
+import pprint
 
 def get_stations_under20(db):
 
@@ -70,4 +70,4 @@ def get_stations_under20(db):
 
 
     for f in found:
-        print(f)
+        pprint.pprint(f)
